@@ -21,6 +21,15 @@ app.get('/og-proxy', async (req, res) => {
 
   try {
     console.log('[PuppeteerProxy] Launching browser...');
+    
+    const isDev = !process.env.AWS_REGION && !process.env.VERCEL;
+
+    const executablePath = isDev
+      ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' // ← шлях до локального Chrome
+      : await chromium.executablePath;
+
+    console.log('[PuppeteerProxy] Chromium path:', executablePath);
+
     const browser = await puppeteer.launch({
       args: chromium.args,
       executablePath: await chromium.executablePath,
@@ -46,9 +55,8 @@ app.get('/og-proxy', async (req, res) => {
 
     await browser.close();
     console.log('[PuppeteerProxy] Extracted metadata:', metadata);
-    res.setHeader('Access-Control-Allow-Origin', '*');
     res.json(metadata);
-
+    console.log(`[PuppeteerProxy] ✅ OG preview sent for: ${url}`);
   } catch (err) {
     console.error('[PuppeteerProxy] Error:', err.message);
     res.status(500).json({ error: 'Puppeteer error', message: err.message });
