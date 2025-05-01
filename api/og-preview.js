@@ -19,7 +19,7 @@ app.get('/og-proxy', async (req, res) => {
 
   try {
     const executablePath = await chromium.executablePath;
-
+    console.log('[chromium.executablePath: ' + executablePath + ' ]');
     const browser = await puppeteer.launch({
       args: chromium.args,
       executablePath,
