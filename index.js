@@ -16,28 +16,44 @@ app.get('/og-proxy', async (req, res) => {
   }
 
   try {
-    const response = await axios.get(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36'
-      }
-    });
+        const response = await axios.get(url, {
+           headers: {
+                      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36'
+           },
+           timeout: 7000
+        });
+    	response.setHeader('Access-Control-Allow-Origin', '*');
+    	const $ = cheerio.load(response.data);
 
-    const html = response.data;
-    const $ = cheerio.load(html);
+    	const ogTitle = $('meta[property="og:title"]').attr('content') || '';
+    	const ogDescription = $('meta[property="og:description"]').attr('content') || '';
+    	const ogImage = $('meta[property="og:image"]').attr('content') || '';
+    	const ogUrl = $('meta[property="og:url"]').attr('content') || url;
 
-    const getMeta = (name) =>
-      $(`meta[property='og:${name}']`).attr('content') ||
-      $(`meta[name='og:${name}']`).attr('content') ||
-      '';
+    	res.setHeader('Access-Control-Allow-Origin', '*');
+    	res.json({
+      	    title: ogTitle,
+      	    description: ogDescription,
+      	    image: ogImage,
+      	    url: ogUrl,
+        });
 
-    const data = {
-      title: getMeta('title') || $('title').first().text(),
-      description: getMeta('description'),
-      image: getMeta('image'),
-      url: getMeta('url') || url
-    };
+        const html = response.data;
+        const $ = cheerio.load(html);
 
-    res.json(data);
+        const getMeta = (name) =>
+          $(`meta[property='og:${name}']`).attr('content') ||
+          $(`meta[name='og:${name}']`).attr('content') ||
+          '';
+
+        const data = {
+          title: getMeta('title') || $('title').first().text(),
+          description: getMeta('description'),
+          image: getMeta('image'),
+          url: getMeta('url') || url
+        };
+
+        res.json(data);
   } catch (error) {
     console.error('[OGProxy] Error fetching:', url, error.message);
     res.status(500).json({ error: 'Failed to fetch OG data' });
