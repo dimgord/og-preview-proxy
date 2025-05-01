@@ -2,7 +2,7 @@
   "version": 2,
   "functions": {
     "index.puppeteer.js": {
-      "runtime": "nodejs18.x",
+      "runtime": "@vercel/node@18.0.0",
       "memory": 512,
       "maxDuration": 10
     }
