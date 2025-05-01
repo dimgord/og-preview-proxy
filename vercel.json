@@ -2,7 +2,7 @@
   "version": 2,
   "functions": {
     "api/og-preview.js": {
-      "runtime": "@vercel/node@18.0.0",
+      "runtime": "@vercel/node@3.2.1",
       "memory": 512,
       "maxDuration": 10
     }
