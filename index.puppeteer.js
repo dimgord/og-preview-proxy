@@ -1,5 +1,6 @@
+import chromium from 'chrome-aws-lambda';
+import puppeteer from 'puppeteer-core';
 import express from 'express';
-import puppeteer from 'puppeteer';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -21,8 +22,9 @@ app.get('/og-proxy', async (req, res) => {
   try {
     console.log('[PuppeteerProxy] Launching browser...');
     const browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: chromium.args,
+      executablePath: await chromium.executablePath,
+      headless: chromium.headless,
     });
 
     const page = await browser.newPage();
