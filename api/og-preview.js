@@ -20,11 +20,17 @@ app.get('/og-proxy', async (req, res) => {
   try {
     const executablePath = await chromium.executablePath || '/usr/bin/chromium-browser';
     console.log('[chromium.executablePath: ' + executablePath + ' ]');
-    const browser = await puppeteer.launch({
-      args: chromium.args,
-      executablePath,
-      headless: chromium.headless,
-    });
+
+const browser = await puppeteer.launch({
+  executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+  args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  headless: true,
+});
+    //const browser = await puppeteer.launch({
+      //args: chromium.args,
+      //executablePath,
+      //headless: chromium.headless,
+    //});
 
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
