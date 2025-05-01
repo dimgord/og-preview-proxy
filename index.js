@@ -12,6 +12,11 @@ app.use((req, res, next) => {
   next();
 });
 
+// Health check route
+app.get('/', (req, res) => {
+  res.send('👋 OG Preview Proxy is running!');
+});
+
 app.get('/og-proxy', async (req, res) => {
   const url = req.query.url;
 
