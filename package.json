@@ -2,17 +2,17 @@
   "name": "og-preview-server",
   "version": "1.0.0",
   "description": "Simple OpenGraph metadata proxy server",
-  "main": "index.puppeteer.js",
+  "main": "api/og-preview.js",
   "type": "module",
   "engines": {
     "node": "20.x"
   },
   "scripts": {
-    "start": "node index.puppeteer.js"
+    "start": "node api/og-preview.js"
   },
   "dependencies": {
     "chrome-aws-lambda": "^10.1.0",
-    "express": "^4.18.2",
-    "puppeteer-core": "^10.4.0"
+    "puppeteer-core": "^10.4.0",
+    "express": "^4.18.2"
   }
 }

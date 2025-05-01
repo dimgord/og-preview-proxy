@@ -1,18 +1,16 @@
+import express from 'express';
 import chromium from 'chrome-aws-lambda';
 import puppeteer from 'puppeteer-core';
-import express from 'express';
 
 const app = express();
-const port = process.env.PORT || 3000;
 
-app.use((req, res, next) => {
+app.use((_, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
 
-app.get('/', (req, res) => {
-  res.send('👋 Puppeteer OG Preview Proxy is running!');
+app.get('/', (_, res) => {
+  res.send('✅ Puppeteer OG Preview Proxy running');
 });
 
 app.get('/og-proxy', async (req, res) => {
@@ -20,49 +18,36 @@ app.get('/og-proxy', async (req, res) => {
   if (!url) return res.status(400).json({ error: 'Missing URL' });
 
   try {
-    console.log('[PuppeteerProxy] Launching browser...');
-    
-    const isDev = !process.env.AWS_REGION && !process.env.VERCEL;
-
-    const executablePath = isDev
-      ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' // ← шлях до локального Chrome
-      : await chromium.executablePath;
-
-    console.log('[PuppeteerProxy] Chromium path:', executablePath);
+    const executablePath = await chromium.executablePath;
 
     const browser = await puppeteer.launch({
       args: chromium.args,
-      executablePath: await chromium.executablePath,
+      executablePath,
       headless: chromium.headless,
     });
 
     const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36');
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
 
     const metadata = await page.evaluate(() => {
-      const getMeta = (prop) =>
-        document.querySelector(`meta[property='og:${prop}']`)?.content ||
-        document.querySelector(`meta[name='og:${prop}']`)?.content || '';
-
+      const get = (p) =>
+        document.querySelector(`meta[property='og:${p}']`)?.content ||
+        document.querySelector(`meta[name='og:${p}']`)?.content || '';
       return {
-        title: getMeta('title') || document.title,
-        description: getMeta('description'),
-        image: getMeta('image'),
-        url: getMeta('url') || window.location.href
+        title: get('title') || document.title,
+        description: get('description'),
+        image: get('image'),
+        url: get('url') || location.href,
       };
     });
 
     await browser.close();
-    console.log('[PuppeteerProxy] Extracted metadata:', metadata);
     res.json(metadata);
-    console.log(`[PuppeteerProxy] ✅ OG preview sent for: ${url}`);
-  } catch (err) {
-    console.error('[PuppeteerProxy] Error:', err.message);
-    res.status(500).json({ error: 'Puppeteer error', message: err.message });
+  } catch (e) {
+    console.error('[PuppeteerProxy] Error:', e.message);
+    res.status(500).json({ error: 'Puppeteer error', message: e.message });
   }
 });
 
-app.listen(port, () => {
-  console.log(`[PuppeteerProxy] Server is running on port ${port}`);
-});
+export default app;
+
