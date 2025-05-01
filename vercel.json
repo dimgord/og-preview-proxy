@@ -1,7 +1,7 @@
 {
   "version": 2,
   "functions": {
-    "index.puppeteer.js": {
+    "api/og-preview.js": {
       "runtime": "@vercel/node@18.0.0",
       "memory": 512,
       "maxDuration": 10
@@ -10,7 +10,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/index.puppeteer.js"
+      "dest": "api/og-preview.js"
     }
   ]
 }
