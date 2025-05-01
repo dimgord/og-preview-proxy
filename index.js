@@ -6,7 +6,11 @@ import cors from 'cors';
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors()); // Allow all origins
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 
 app.get('/og-proxy', async (req, res) => {
   const url = req.query.url;
