@@ -10,7 +10,12 @@ app.get('/og-proxy', async (req, res) => {
   if (!url) return res.status(400).send('Missing url');
 
   try {
-    const response = await axios.get(url, { timeout: 7000 });
+        const response = await axios.get(url, {
+           headers: {
+                      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36'
+           },
+           timeout: 7000
+        });
     const $ = cheerio.load(response.data);
 
     const ogTitle = $('meta[property="og:title"]').attr('content') || '';
