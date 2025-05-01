@@ -16,6 +16,7 @@ app.get('/og-proxy', async (req, res) => {
            },
            timeout: 7000
         });
+    response.setHeader('Access-Control-Allow-Origin', '*');
     const $ = cheerio.load(response.data);
 
     const ogTitle = $('meta[property="og:title"]').attr('content') || '';
