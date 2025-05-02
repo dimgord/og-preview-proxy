@@ -18,7 +18,7 @@ app.get('/og-proxy', async (req, res) => {
   if (!url) return res.status(400).json({ error: 'Missing URL' });
 
   try {
-    const executablePath = await chromium.executablePath || '/usr/bin/chromium-browser';
+    const executablePath = await chromium.executablePath || '/usr/bin/chromium';
     console.log('[chromium.executablePath: ' + executablePath + ' ]');
 
 const browser = await puppeteer.launch({
